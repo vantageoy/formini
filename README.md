@@ -135,3 +135,4 @@ MIT
 - Async validation
 - Unit testing after refactoring
   - Separate core out from the Flutter stuff
+- Benchmarking
