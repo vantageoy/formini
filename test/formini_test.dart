@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:formini/example/app.dart';
+
+import 'example/app.dart';
 
 void main() {
   testWidgets('it completes the example app form', (tester) async {
