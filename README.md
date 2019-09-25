@@ -104,13 +104,13 @@ class LoginFormValidator implements Validator {
 
 #### 2. Option - Schemani (recommended)
 
-Use [formini-schemani](https://pub.dev/packages/formini-schemani) package for validating values using [schemani](https://pub.dev/packages/schemani). Or just copy the one simple file to your project.
+Use [schemani_formini](https://pub.dev/packages/schemani_formini) package for validating values using [schemani](https://pub.dev/packages/schemani). Or just copy the one simple file to your project.
 
 ```dart
 import 'package:schemani/schemani.dart';
-import 'package:formini-schemani/validator.dart';
+import 'package:schemani_formini/schemani_formini.dart';
 
-const LoginFormValidator = ForminiSchemaniValidator(MapSchema({
+const loginFormValidator = SchemaniForminiValidator(MapSchema({
   'email': [Required(), Email()],
   'password': [Required()],
 }));
