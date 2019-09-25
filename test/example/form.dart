@@ -57,7 +57,8 @@ class ExampleForm extends StatelessWidget {
             obscureText: true,
             decoration: InputDecoration(
               labelText: 'Password',
-              errorText: state.field.errorText,
+              errorText:
+                  state.field.touched ? state.field.error?.toString() : null,
             ),
           ),
         ),

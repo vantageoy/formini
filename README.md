@@ -45,7 +45,8 @@ class LoginForm extends StatelessWidget {
             obscureText: true,
             decoration: InputDecoration(
               labelText: 'Password',
-              errorText: state.field.errorText,
+              errorText: 
+                  state.field.touched ? state.field.error?.toString() : null,
             ),
           ),
         ),
@@ -115,7 +116,7 @@ const LoginFormValidator = ForminiSchemaniValidator(MapSchema({
 
 ## API reference
 
-https://pub.dev/documentation/schemani
+https://pub.dev/documentation/formini
 
 ## Contributing
 
