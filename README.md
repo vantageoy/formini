@@ -10,7 +10,7 @@ Formini doesn't care what inputs you use. It however provides a `TextEditingCont
 
 Values are not limited only to Dart built in types. If you want to store a date field as `DateTime` and display the value formatted you absolutely can.
 
-![Login form using formini](https://raw.githubusercontent.com/vantageoy/formini/master/readme-login-form.png)
+![Login form using formini](https://raw.githubusercontent.com/vantageoy/formini/master/login-form.png)
 
 ```dart
 import 'package:flutter/material.dart';
