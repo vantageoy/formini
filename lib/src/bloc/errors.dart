@@ -15,18 +15,25 @@ class ForminiValuesChangeEvent extends ForminiErrorsEvent {
   String toString() => '${describeIdentity(this)}($values)';
 }
 
-class ForminiErrorsBloc extends Bloc<ForminiErrorsEvent, Map<String, Exception>> {
+// BLoC disallows null states so wrap errors to a state class.
+class ForminiErrorsState {
+  final ForminiException errors;
+
+  const ForminiErrorsState(this.errors);
+}
+
+class ForminiErrorsBloc extends Bloc<ForminiErrorsEvent, ForminiErrorsState> {
   final Validator validator;
 
   ForminiErrorsBloc(this.validator);
 
   @override
-  get initialState => {};
+  get initialState => const ForminiErrorsState(null);
 
   @override
   mapEventToState(ForminiErrorsEvent event) async* {
     if (event is ForminiValuesChangeEvent) {
-      yield validator.validate(event.values);
+      yield ForminiErrorsState(validator.validate(event.values));
     }
   }
 }

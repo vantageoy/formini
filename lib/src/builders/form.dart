@@ -49,10 +49,10 @@ class Formini<T extends Map<String, dynamic>> extends StatelessWidget {
             ForminiValuesChangeEvent(values: values),
           );
         },
-        child: BlocListener<ForminiErrorsBloc, Map<String, Exception>>(
-          listener: (context, errors) {
+        child: BlocListener<ForminiErrorsBloc, ForminiErrorsState>(
+          listener: (context, errorsState) {
             BlocProvider.of<ForminiStatusBloc>(context).dispatch(
-              errors.isEmpty
+              errorsState.errors == null
                   ? ForminiStatusEvent.valid()
                   : ForminiStatusEvent.invalid(),
             );

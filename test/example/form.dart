@@ -5,22 +5,19 @@ class ExampleFormValidator implements Validator {
   const ExampleFormValidator();
 
   @override
-  Map<String, Exception> validate(Map<String, dynamic> values) {
-    final errors = <String, Exception>{};
+  ForminiException validate(Map<String, dynamic> values) {
+    final errors = {
+      if (values['email'] == null || values['email'].isEmpty)
+        'email': ForminiException(message: 'Email is required')
+      else if (!values['email'].contains('@'))
+        'email': ForminiException(message: 'Email is invalid'),
+      if (values['password'] == null || values['password'].isEmpty)
+        'password': ForminiException(message: 'Password is required')
+      else if (values['password'].length < 5)
+        'password': ForminiException(message: 'Password min length is 5'),
+    };
 
-    if (values['email'] == null || values['email'].isEmpty) {
-      errors['email'] = Exception('Email is required');
-    } else if (!values['email'].contains('@')) {
-      errors['email'] = Exception('Email is invalid');
-    }
-
-    if (values['password'] == null || values['password'].isEmpty) {
-      errors['password'] = Exception('Password is required');
-    } else if (values['password'].length < 5) {
-      errors['password'] = Exception('Password min length is 5');
-    }
-
-    return errors;
+    return errors.isEmpty ? null : ForminiException.map(errors);
   }
 }
 

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:formini/src/builders/state_builder.dart';
+import 'package:formini/src/validator.dart';
 
 class ForminiFieldState<T extends Object> {
   final T value;
-  final Exception error;
+  final ForminiException error;
   final bool touched;
 
   String get errorText => touched ? error?.toString() : null;
@@ -32,7 +33,7 @@ class ForminiFieldStateBuilder<T extends Object> extends StatelessWidget {
     return ForminiStateBuilder(builder: (context, form) {
       final state = ForminiFieldState<T>(
         value: form.values[name],
-        error: form.errors[name],
+        error: form.errors != null ? form.errors[name] : null,
         touched: form.touches[name] ?? false,
       );
 

@@ -4,22 +4,21 @@ import 'package:formini/src/bloc/errors.dart';
 import 'package:formini/src/bloc/status.dart';
 import 'package:formini/src/bloc/touches.dart';
 import 'package:formini/src/bloc/values.dart';
+import 'package:formini/src/validator.dart';
 import 'package:rxdart/rxdart.dart';
-
 
 class ForminiState {
   final ForminiStatusState status;
   final Map<String, Object> values;
-  final Map<String, Exception> errors;
+  final ForminiException errors;
   final Map<String, bool> touches;
-  final Function submit;
+  Function submit;
 
-  const ForminiState({
+  ForminiState({
     this.status,
     this.values,
     this.errors,
     this.touches,
-    this.submit,
   });
 }
 
@@ -31,10 +30,8 @@ typedef Widget ForminiStateBuilderFunction(
 class ForminiStateBuilder<T> extends StatelessWidget {
   final ForminiStateBuilderFunction builder;
 
-  const ForminiStateBuilder({
-    Key key,
-    @required this.builder,
-  })  : assert(builder != null),
+  const ForminiStateBuilder({Key key, @required this.builder})
+      : assert(builder != null),
         super(key: key);
 
   @override
@@ -45,26 +42,39 @@ class ForminiStateBuilder<T> extends StatelessWidget {
         BlocProvider.of<ForminiTouchesBloc>(context).state,
         BlocProvider.of<ForminiErrorsBloc>(context).state,
         BlocProvider.of<ForminiStatusBloc>(context).state,
-        (values, touches, errors, status) => ForminiState(
-          values: values,
-          touches: touches,
-          errors: errors,
-          status: status,
-          submit: status.invalid
-              ? null
-              : () {
-                  BlocProvider.of<ForminiStatusBloc>(context)
-                      .dispatch(ForminiStatusEvent.submitting(values));
-                },
-        ),
+        _combiner,
       ),
       builder: (context, AsyncSnapshot<ForminiState> snapshot) {
         if (snapshot.hasData) {
+          // @todo submit fn shouldn't go into the state.
+          // ForminiActions?
+          if (snapshot.data.status.valid) {
+            snapshot.data.submit = () {
+              BlocProvider.of<ForminiStatusBloc>(context).dispatch(
+                ForminiStatusEvent.submitting(snapshot.data.values),
+              );
+            };
+          }
+
           return builder(context, snapshot.data);
         }
 
         return Container();
       },
+    );
+  }
+
+  ForminiState _combiner(
+    Map<String, dynamic> values,
+    Map<String, bool> touches,
+    ForminiErrorsState errorsState,
+    ForminiStatusState status,
+  ) {
+    return ForminiState(
+      values: values,
+      touches: touches,
+      errors: errorsState.errors,
+      status: status,
     );
   }
 }

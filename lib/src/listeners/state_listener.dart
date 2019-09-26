@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:formini/formini.dart';
 import 'package:formini/src/bloc/errors.dart';
 import 'package:formini/src/bloc/status.dart';
 import 'package:formini/src/bloc/touches.dart';
@@ -53,13 +54,13 @@ class _ForminiStateListenerState extends State<ForminiStateListener> {
   ForminiState _combiner(
     Map<String, dynamic> values,
     Map<String, bool> touches,
-    Map<String, Exception> errors,
+    ForminiErrorsState errorsState,
     ForminiStatusState status,
   ) {
     return ForminiState(
       values: values,
       touches: touches,
-      errors: errors,
+      errors: errorsState.errors,
       status: status,
     );
   }
