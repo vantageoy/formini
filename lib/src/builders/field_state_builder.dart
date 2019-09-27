@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:formini/src/builders/state_builder.dart';
-import 'package:formini/src/validator.dart';
+import 'package:formini/src/exception.dart';
 
 class ForminiFieldState<T extends Object> {
   final T value;

@@ -4,7 +4,7 @@ import 'package:formini/src/bloc/errors.dart';
 import 'package:formini/src/bloc/status.dart';
 import 'package:formini/src/bloc/touches.dart';
 import 'package:formini/src/bloc/values.dart';
-import 'package:formini/src/validator.dart';
+import 'package:formini/src/exception.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ForminiState {

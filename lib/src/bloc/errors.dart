@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:formini/src/exception.dart';
 import 'package:formini/src/validator.dart';
 
 abstract class ForminiErrorsEvent {
