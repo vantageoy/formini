@@ -2,7 +2,7 @@
 
 Working with forms shouldn't be so hard in Flutter.
 
-Please note that the schemani/formini packages are under development. There are still some issues to resolve before this has any help for real use cases. [#roadmap](#roadmap)
+Please note that the schemani/formini packages are under development. There are still some issues to resolve before this has any help for real use cases.
 
 ## Usage
 
@@ -127,12 +127,3 @@ Please open an issue or pull request in GitHub. Any help and feedback is much ap
 ## Licence
 
 MIT
-
-## Roadmap
-
-- Support for nested values maps
-- Support for lists
-- Async validation
-- Unit testing after refactoring
-  - Separate core out from the Flutter stuff
-- Benchmarking
