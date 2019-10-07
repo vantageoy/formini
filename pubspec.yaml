@@ -10,9 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  bloc: ^0.15.0
-  flutter_bloc: ^0.21.0
-  rxdart: ^0.22.2
+  redux: ^3.0.0
+  flutter_redux: ^0.5.3
+  schemani: 
+    path: '../schemani'
   
 dev_dependencies:
   flutter_test:

@@ -41,11 +41,6 @@ void main() {
     expectLater(containsText('valid: true'), findsOneWidget);
     expectLater(containsText('password: 123456'), findsOneWidget);
     expectLater(containsText('email: foo@bar.fi'), findsOneWidget);
-
-    expectLater(containsText('submitted: false'), findsOneWidget);
-    await tester.tap(containsText('Login'));
-    await tester.pumpAndSettle();
-    expectLater(containsText('submitted: true'), findsOneWidget);
   });
 }
 
