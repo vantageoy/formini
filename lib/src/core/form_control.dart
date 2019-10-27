@@ -7,6 +7,7 @@ import 'package:rxdart/rxdart.dart';
 class FormControl<T> implements AbstractControl<T> {
   final BehaviorSubject<T> _valueSubject;
   final Validator _validator;
+  final List<Function> validators;
 
   Stream<ForminiState<T>> get stateChanges => _valueSubject.scan(
         (previousState, value, i) => ForminiState(
@@ -16,7 +17,7 @@ class FormControl<T> implements AbstractControl<T> {
         ),
       );
 
-  FormControl([T initialValue, List<Function> validators = const []])
+  FormControl([T initialValue, this.validators = const []])
       : _valueSubject = BehaviorSubject.seeded(initialValue),
         _validator = CombineValidators(validators);
 

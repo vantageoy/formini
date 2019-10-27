@@ -5,27 +5,34 @@ import 'package:rxdart/rxdart.dart';
 
 class FormGroup<T extends Map<String, dynamic>> implements AbstractControl<T> {
   final Map<String, AbstractControl> controls;
+  final List<Function> validators;
 
-  Stream<ForminiState<T>> stateChanges;
+  Map<String, AbstractControl> get shape => controls;
 
-  FormGroup(this.controls, [List<Function> validators = const []])
-      : stateChanges = Observable.combineLatest(
-          controls.values.map((control) => control.stateChanges),
-          (List<ForminiState> controlStates) {
-            final states = Map.fromIterables(controls.keys, controlStates);
-            final errors = states.map(
-              (key, state) => MapEntry(key, state.error),
-            )..removeWhere((key, error) => error == null);
+  Stream<ForminiState<T>> get stateChanges => Observable.combineLatest(
+        shape.values.map((control) => control.stateChanges),
+        (List<ForminiState> controlStates) {
+          final states = Map.fromIterables(shape.keys, controlStates);
+          final value = states.map(
+            (key, state) => MapEntry(key, state.value),
+          );
+          final errors = states.map(
+            (key, state) => MapEntry(key, state.error),
+          )..removeWhere((key, error) => error == null);
 
-            return ForminiState(
-              value: states.map((key, state) => MapEntry(key, state.value)),
-              error: errors.isEmpty ? null : FormGroupException(errors),
-              pristine: controlStates.every((state) => state.pristine),
-            );
-          },
-        ).asBroadcastStream() as dynamic; // @todo remove dynamic
+          // CombineValidators(validators)(value);
+
+          return ForminiState(
+            value: value,
+            error: errors.isEmpty ? null : FormGroupException(errors),
+            pristine: controlStates.every((state) => state.pristine),
+          );
+        },
+      );
+
+  FormGroup([this.controls = const {}, this.validators = const []]);
 
   setValue(T values) {
-    controls.forEach((key, control) => control.setValue(values[key]));
+    shape.forEach((key, control) => control.setValue(values[key]));
   }
 }

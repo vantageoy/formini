@@ -1,155 +1,176 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:formini/formini.dart';
+import 'package:formstate/initials.dart';
+import 'package:formstate/user_form_state.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:schemani/schemani.dart';
 
-enum Level { basic, premium }
+const levelErrorMessages = {
+  RequiredValidationException: 'Sorry, no guests allowed right now.',
+};
 
 class UserForm extends StatelessWidget {
-  final form = FormGroup({
-    'email': FormControl<String>(null, [Required(), Email()]),
-    'profile': FormGroup({
-      'name': FormControl<String>(null, [Required()]),
-      'avatar': FormControl<File>(),
-      'level': FormControl<Level>(Level.basic, [Required()]),
-    }),
-    'newsletter': FormControl<bool>(false),
-    'newsletter_at': FormControl<DateTime>(null),
-  });
+  final UserFormState user;
+
+  UserForm(
+      [Map initialValues = const {
+        'profile': {'name': 'foo'} // just for example
+      }])
+      : user = UserFormState(initialValues);
 
   @override
   Widget build(BuildContext context) {
-    return FormGroupProvider(
-      group: form,
-      child: ListView(children: [
-        ListTile(
-          title: Text(
-            'Profile',
-            style: Theme.of(context).textTheme.caption,
-          ),
-        ),
-        FormControlBuilder(
-          name: 'profile',
-          builder: (context, control, state) {
-            final group = control as FormGroup;
+    return ListView(children: [
+      ListTile(
+        title: Text('Profile', style: Theme.of(context).textTheme.caption),
+      ),
+      FormControlBuilder(
+        control: user.name,
+        builder: (context, nameState) => FormControlBuilder(
+          control: user.avatar,
+          builder: (context, avatarState) => ListTile(
+            leading: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () async {
+                final image = await ImagePicker.pickImage(
+                  source: ImageSource.gallery,
+                );
 
-            return ListTile(
-              leading: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () async {
-                  group.controls['avatar'].setValue(
-                    await ImagePicker.pickImage(source: ImageSource.gallery),
-                  );
-                },
-                child: CircleAvatar(
-                  backgroundImage: state.value['avatar'] == null
-                      ? null
-                      : FileImage(state.value['avatar']),
-                  child: state.value['name'] != null &&
-                          state.value['avatar'] == null
-                      ? Text(state.value['name']
-                          .toString()
-                          .split(' ')
-                          .take(2)
-                          .map((word) => word.isEmpty ? '' : word[0])
-                          .join()
-                          .toUpperCase())
-                      : null,
-                ),
+                user.avatar.setValue(image);
+              },
+              child: CircleAvatar(
+                backgroundImage: avatarState.value == null
+                    ? null
+                    : FileImage(avatarState.value),
+                child: nameState.value != null && avatarState.value == null
+                    ? Text(initials(nameState.value))
+                    : null,
               ),
-              title: TextField(
-                onChanged: group.controls['name'].setValue,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  border: InputBorder.none,
-                  // errorText: state.dirty ? state.error?.toString() : null,
-                ),
-              ),
-            );
-          },
-        ),
-        Divider(),
-        ListTile(
-          leading: CircleAvatar(
-            child: Icon(Icons.email),
-            backgroundColor: Colors.transparent,
-            foregroundColor: Colors.grey,
-          ),
-          title: FormEditableTextAdaptor(
-            name: 'email',
-            builder: (context, controller, state) => TextField(
-              controller: controller,
+            ),
+            title: TextFormField(
+              initialValue: nameState.value,
+              onChanged: user.name.setValue,
               decoration: InputDecoration(
-                labelText: 'Email address',
-                errorText: state.dirty ? state.error?.toString() : null,
+                labelText: 'Name',
                 border: InputBorder.none,
+                errorText: nameState.dirty ? nameState.error?.toString() : null,
               ),
             ),
           ),
         ),
-        Divider(),
-        ListTile(
-          title: Text(
-            'Account level',
-            style: Theme.of(context).textTheme.caption,
+      ),
+      Divider(),
+      ListTile(
+        leading: CircleAvatar(
+          child: Icon(Icons.email),
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.grey,
+        ),
+        title: FormControlBuilder(
+          control: user.email,
+          builder: (context, state) => TextFormField(
+            initialValue: state.value,
+            onChanged: user.email.setValue,
+            decoration: InputDecoration(
+              labelText: 'Email address',
+              errorText: state.dirty ? state.error?.toString() : null,
+              border: InputBorder.none,
+            ),
           ),
         ),
-        FormControlBuilder<Level>(
-          control: (form.controls['profile'] as FormGroup).controls['level'],
-          builder: (context, control, state) => Column(children: [
-            RadioListTile(
-              title: Text('Guest'),
-              value: null,
-              groupValue: state.value,
-              onChanged: control.setValue,
+      ),
+      Divider(),
+      FormControlBuilder<Level>(
+        control: user.level,
+        builder: (context, state) => Column(children: [
+          ListTile(
+            title: Text(
+              'Account level',
+              style: Theme.of(context).textTheme.caption,
             ),
-            RadioListTile(
-              title: Text('Basic'),
-              value: Level.basic,
-              groupValue: state.value,
-              onChanged: control.setValue,
-            ),
-            RadioListTile(
-              title: Text('Premium'),
-              value: Level.premium,
-              groupValue: state.value,
-              onChanged: control.setValue,
-            ),
-          ]),
-        ),
-        Divider(),
-        FormControlBuilder<bool>(
-          name: 'newsletter',
-          builder: (context, control, state) => CheckboxListTile(
+            subtitle: state.dirty && state.invalid
+                ? Text(
+                    levelErrorMessages.containsKey(state.error.runtimeType)
+                        ? levelErrorMessages[state.error.runtimeType]
+                        : state.error.toString(),
+                    style: TextStyle(color: Colors.red),
+                  )
+                : null,
+          ),
+          RadioListTile(
+            title: Text('Guest'),
+            value: null,
+            groupValue: state.value,
+            onChanged: user.level.setValue,
+          ),
+          RadioListTile(
+            title: Text('Basic'),
+            value: Level.basic,
+            groupValue: state.value,
+            onChanged: user.level.setValue,
+          ),
+          RadioListTile(
+            title: Text('Premium'),
+            value: Level.premium,
+            groupValue: state.value,
+            onChanged: user.level.setValue,
+          ),
+        ]),
+      ),
+      Divider(),
+      FormControlBuilder(
+        control: user.hasDriverLicence,
+        builder: (context, state) => Column(children: [
+          CheckboxListTile(
             value: state.value,
-            onChanged: control.setValue,
-            title: Text('Newsletter'),
+            onChanged: user.hasDriverLicence.setValue,
+            title: Text('Driver licence'),
             subtitle: Text(state.value
-                ? 'Weekly news are sent to your mail box'
-                : "No weekly mails are sent"),
+                ? 'The user has a driver licence'
+                : 'The user does not have a driver licence'),
           ),
-        ),
-        FormControlBuilder<DateTime>(
-          name: 'newsletter_at',
-          builder: (context, control, state) => Text('millo?'),
-        ),
-        Divider(),
-        FormControlBuilder<Map>(
-          control: form,
-          builder: (context, control, state) => Column(children: [
-            Text(DateTime.now().toString(), style: TextStyle(fontSize: 18)),
-            Text(state.value.toString()),
-            if (state.dirty)
-              Text(state.error.toString(), style: TextStyle(color: Colors.red)),
-            RaisedButton(
-              child: Text('Submit'),
-              onPressed: state.invalid ? null : () => print(state),
-            )
-          ]),
-        ),
-      ]),
-    );
+          if (state.value)
+            ListTile(
+              title: FormControlBuilder(
+                control: user.driverLicenceExpires,
+                builder: (context, state) => TextField(
+                  controller: TextEditingController(
+                    text: state.value?.toString(),
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Expiry date',
+                    helperText: 'Located on the back side of the card',
+                  ),
+                  onTap: () async {
+                    final datetime = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2018),
+                      lastDate: DateTime(2030),
+                    );
+
+                    user.driverLicenceExpires.setValue(datetime);
+                  },
+                ),
+              ),
+            ),
+        ]),
+      ),
+      Divider(),
+      FormControlBuilder(
+        control: user,
+        builder: (context, state) => Column(children: [
+          Text(DateTime.now().toString(), style: TextStyle(fontSize: 18)),
+          Text(state.value.toString()),
+          if (state.invalid)
+            Text(state.error.toString(), style: TextStyle(color: Colors.red)),
+          RaisedButton(
+            child: Text('Submit'),
+            // todo markAsDirty() on invalid so the error messages comes visible
+            onPressed: state.invalid ? null : () => print(state),
+          ),
+        ]),
+      ),
+    ]);
   }
 }

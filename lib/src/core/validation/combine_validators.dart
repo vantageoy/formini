@@ -3,7 +3,7 @@ import 'package:formini/src/core/validation/validator.dart';
 class CombineValidators<T> implements Validator<T> {
   final List<Function> _validators;
 
-  CombineValidators(this._validators);
+  const CombineValidators(this._validators);
 
   @override
   call(T value) {
